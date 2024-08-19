@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resume-tailor
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: resume-tailor
+  template:
+    metadata:
+      labels:
+        app: resume-tailor
+    spec:
+      containers:
+      - name: resume-tailor
+        image: your-docker-registry/resume-tailor:latest
+        ports:
+        - containerPort: 5000
