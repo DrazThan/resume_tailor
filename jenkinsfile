@@ -1,0 +1,33 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'python3 -m venv venv'
+                sh '. venv/bin/activate'
+                sh 'pip install -r requirements.txt'
+                sh 'python -m unittest discover tests'
+            }
+        }
+
+        stage('Deploy') {
+            when {
+                branch 'main'
+            }
+            steps {
+                withCredentials([file(credentialsId: 'gcp-service-account-key', variable: 'GCP_SA_KEY')]) {
+                    sh 'gcloud auth activate-service-account --key-file=${GCP_SA_KEY}'
+                    sh 'gcloud compute scp --recurse ./* resume-tailor-instance:/home/your_username/app'
+                    sh 'gcloud compute ssh resume-tailor-instance --command="cd /home/your_username/app && bash deploy.sh"'
+                }
+            }
+        }
+    }
+}
