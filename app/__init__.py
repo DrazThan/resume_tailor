@@ -21,12 +21,18 @@ def create_app():
     limiter.init_app(app)
 
     with app.app_context():
-        # Import routes here to avoid circular imports
-        from app import routes, models
+        # Import and register blueprint
+        from app.routes import main as main_blueprint
+        app.register_blueprint(main_blueprint)
 
-        # Register the metric only once
-        if 'app_info' not in metrics._metrics:
+        # Import models
+        from app import models
+
+        # Register the metric
+        try:
             metrics.info('app_info', 'Application info', version='1.0.0')
+        except Exception as e:
+            app.logger.warning(f"Failed to register app_info metric: {str(e)}")
 
     @login_manager.user_loader
     def load_user(user_id):
