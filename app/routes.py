@@ -1,18 +1,18 @@
-from flask import jsonify, request, current_app
+from flask import Blueprint, jsonify, request, current_app
 from flask_login import login_user, login_required, current_user, logout_user
 from app import db, limiter
 from app.models import User, Resume, JobDescription, TailoredResume
 from app.services.claude_service import ClaudeService
 import logging
 
-claude_service = ClaudeService()
+main = Blueprint('main', __name__)
 
-@app.errorhandler(Exception)
+@main.errorhandler(Exception)
 def handle_exception(e):
     current_app.logger.error(f"Unhandled exception: {str(e)}")
     return jsonify({"error": "An unexpected error occurred"}), 500
 
-@app.route('/api/v1/register', methods=['POST'])
+@main.route('/api/v1/register', methods=['POST'])
 @limiter.limit("5 per hour")
 def register():
     try:
@@ -37,7 +37,7 @@ def register():
         current_app.logger.error(f"Error registering user: {str(e)}")
         return jsonify({"error": "Failed to register user"}), 500
 
-@app.route('/api/v1/login', methods=['POST'])
+@main.route('/api/v1/login', methods=['POST'])
 @limiter.limit("10 per minute")
 def login():
     try:
@@ -55,13 +55,13 @@ def login():
         current_app.logger.error(f"Error logging in: {str(e)}")
         return jsonify({"error": "Failed to log in"}), 500
 
-@app.route('/api/v1/logout', methods=['POST'])
+@main.route('/api/v1/logout', methods=['POST'])
 @login_required
 def logout():
     logout_user()
     return jsonify({"message": "Logged out successfully"}), 200
 
-@app.route('/api/v1/resumes', methods=['POST'])
+@main.route('/api/v1/resumes', methods=['POST'])
 @login_required
 @limiter.limit("5 per minute")
 def create_resume():
