@@ -93,7 +93,7 @@ def create_resume():
         current_app.logger.error(f"Error creating resume: {str(e)}")
         return jsonify({"error": "Failed to create resume"}), 500
 
-@app.route('/api/v1/tailor_resume', methods=['POST'])
+@main.route('/api/v1/tailor_resume', methods=['POST'])
 @login_required
 @limiter.limit("3 per minute")
 def tailor_resume():
@@ -140,7 +140,7 @@ def tailor_resume():
         current_app.logger.error(f"Error tailoring resume: {str(e)}")
         return jsonify({"error": "Failed to tailor resume"}), 500
 
-@app.route('/api/v1/resumes', methods=['GET'])
+@main.route('/api/v1/resumes', methods=['GET'])
 @login_required
 def get_user_resumes():
     resumes = Resume.query.filter_by(user_id=current_user.id).all()
@@ -151,7 +151,7 @@ def get_user_resumes():
         "analysis": resume.analysis
     } for resume in resumes]), 200
 
-@app.route('/api/v1/job_descriptions', methods=['GET'])
+@main.route('/api/v1/job_descriptions', methods=['GET'])
 @login_required
 def get_user_job_descriptions():
     job_descriptions = JobDescription.query.filter_by(user_id=current_user.id).all()
@@ -161,7 +161,7 @@ def get_user_job_descriptions():
         "created_at": job.created_at
     } for job in job_descriptions]), 200
 
-@app.route('/api/v1/tailored_resumes', methods=['GET'])
+@main.route('/api/v1/tailored_resumes', methods=['GET'])
 @login_required
 def get_user_tailored_resumes():
     tailored_resumes = TailoredResume.query.filter_by(user_id=current_user.id).all()
