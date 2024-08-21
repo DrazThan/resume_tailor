@@ -1,11 +1,10 @@
 from flask import jsonify, request, current_app
 from flask_login import login_user, login_required, current_user, logout_user
-from app import create_app, db, limiter
+from app import db, limiter
 from app.models import User, Resume, JobDescription, TailoredResume
 from app.services.claude_service import ClaudeService
 import logging
 
-app = create_app()
 claude_service = ClaudeService()
 
 @app.errorhandler(Exception)

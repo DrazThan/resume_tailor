@@ -20,10 +20,13 @@ def create_app():
     metrics.init_app(app)
     limiter.init_app(app)
 
-    # Add some default metrics
-    metrics.info('app_info', 'Application info', version='1.0.0')
+    with app.app_context():
+        # Import routes here to avoid circular imports
+        from app import routes, models
 
-    from app import routes, models
+        # Register the metric only once
+        if 'app_info' not in metrics._metrics:
+            metrics.info('app_info', 'Application info', version='1.0.0')
 
     @login_manager.user_loader
     def load_user(user_id):
