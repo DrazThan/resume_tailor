@@ -11,7 +11,7 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 metrics = PrometheusMetrics(app=None)
 limiter = Limiter(key_func=get_remote_address)
-migrate = Migrate(app, db)
+migrate = Migrate()
 
 def create_app():
     app = Flask(__name__)
@@ -21,6 +21,7 @@ def create_app():
     login_manager.init_app(app)
     metrics.init_app(app)
     limiter.init_app(app)
+    migrate.init_app(app, db)
 
     with app.app_context():
         # Import and register blueprint
