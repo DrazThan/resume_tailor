@@ -6,11 +6,15 @@ from flask_migrate import Migrate
 from flask_limiter.util import get_remote_address
 from prometheus_flask_exporter import PrometheusMetrics
 from config import Config
+import redis
 
 db = SQLAlchemy()
 login_manager = LoginManager()
 metrics = PrometheusMetrics(app=None)
-limiter = Limiter(key_func=get_remote_address)
+limiter = Limiter(
+    key_func=get_remote_address,
+    storage_uri="redis://localhost:6379"
+)
 migrate = Migrate()
 
 def create_app():
