@@ -1,7 +1,63 @@
-venv/
-*.pyc
+# Python
 __pycache__/
+*.py[cod]
+*.so
+
+# Virtual Environment
+venv/
+*.venv
+env/
+*.env
+
+# Flask
+instance/
+.webassets-cache
+
+# SQLite database files
+*.db
+*.sqlite
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Dependency directories
+node_modules/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environment variables
 .env
+.env.local
+.env.*.local
+
+# React build output
+/build
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
 notes.txt
 cloud_sql_proxy/
 # Terraform files
