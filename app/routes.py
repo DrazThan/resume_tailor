@@ -1,18 +1,18 @@
-from flask import jsonify, request, current_app
+from flask import Blueprint, jsonify, request, current_app
 from flask_login import login_user, login_required, current_user, logout_user
 from app import db, limiter
 from app.models import User, Resume, JobDescription, TailoredResume
 from app.services.claude_service import ClaudeService
 import logging
 
-claude_service = ClaudeService()
+main = Blueprint('main', __name__)
 
-@app.errorhandler(Exception)
+@main.errorhandler(Exception)
 def handle_exception(e):
     current_app.logger.error(f"Unhandled exception: {str(e)}")
     return jsonify({"error": "An unexpected error occurred"}), 500
 
-@app.route('/api/v1/register', methods=['POST'])
+@main.route('/api/v1/register', methods=['POST'])
 @limiter.limit("5 per hour")
 def register():
     try:
@@ -37,7 +37,7 @@ def register():
         current_app.logger.error(f"Error registering user: {str(e)}")
         return jsonify({"error": "Failed to register user"}), 500
 
-@app.route('/api/v1/login', methods=['POST'])
+@main.route('/api/v1/login', methods=['POST'])
 @limiter.limit("10 per minute")
 def login():
     try:
@@ -55,13 +55,13 @@ def login():
         current_app.logger.error(f"Error logging in: {str(e)}")
         return jsonify({"error": "Failed to log in"}), 500
 
-@app.route('/api/v1/logout', methods=['POST'])
+@main.route('/api/v1/logout', methods=['POST'])
 @login_required
 def logout():
     logout_user()
     return jsonify({"message": "Logged out successfully"}), 200
 
-@app.route('/api/v1/resumes', methods=['POST'])
+@main.route('/api/v1/resumes', methods=['POST'])
 @login_required
 @limiter.limit("5 per minute")
 def create_resume():
@@ -93,7 +93,7 @@ def create_resume():
         current_app.logger.error(f"Error creating resume: {str(e)}")
         return jsonify({"error": "Failed to create resume"}), 500
 
-@app.route('/api/v1/tailor_resume', methods=['POST'])
+@main.route('/api/v1/tailor_resume', methods=['POST'])
 @login_required
 @limiter.limit("3 per minute")
 def tailor_resume():
@@ -140,7 +140,7 @@ def tailor_resume():
         current_app.logger.error(f"Error tailoring resume: {str(e)}")
         return jsonify({"error": "Failed to tailor resume"}), 500
 
-@app.route('/api/v1/resumes', methods=['GET'])
+@main.route('/api/v1/resumes', methods=['GET'])
 @login_required
 def get_user_resumes():
     resumes = Resume.query.filter_by(user_id=current_user.id).all()
@@ -151,7 +151,7 @@ def get_user_resumes():
         "analysis": resume.analysis
     } for resume in resumes]), 200
 
-@app.route('/api/v1/job_descriptions', methods=['GET'])
+@main.route('/api/v1/job_descriptions', methods=['GET'])
 @login_required
 def get_user_job_descriptions():
     job_descriptions = JobDescription.query.filter_by(user_id=current_user.id).all()
@@ -161,7 +161,7 @@ def get_user_job_descriptions():
         "created_at": job.created_at
     } for job in job_descriptions]), 200
 
-@app.route('/api/v1/tailored_resumes', methods=['GET'])
+@main.route('/api/v1/tailored_resumes', methods=['GET'])
 @login_required
 def get_user_tailored_resumes():
     tailored_resumes = TailoredResume.query.filter_by(user_id=current_user.id).all()
